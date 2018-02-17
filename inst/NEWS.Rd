@@ -1,6 +1,146 @@
 \name{NEWS}
 \title{NEWS file for the stm package}
-
+\section{Version 1.3.3}{
+\itemize{
+\item Multiple improvements from Yuval Dugan.  Allow topics to be scaled by vertex size in plot.topicCorr.  toLDAvis now allows renumbering of topics.
+\item Numerous documentation updates.
+\item In order to facilitate interoperability, more functions can now take quanteda and Matrix objects.  Thanks to Julia Silge for the suggestion!
+}
+}
+\section{Version 1.3.1}{
+\itemize{
+\item Fixing a problem with ngroups and adding a test to detect such problems in the future. Thanks to Igor Elbert for finding this. 
+\item Fixing a bug in K=0 where the method could fail if the perplexity was too large. It now automatically tries to reset itself.  To help with this in the future the initial dimension and perplexity values can now be set through the control options in stm.  Thanks to Mario Santoro for the bug catch and excellent replication file.
+\item Fixed a very small edge case bug with an internal function that powers prepDocuments() which would cause document sets where every single document had the same number of unique words to fail.
+\item Fixed an issue with heldout document creation where a document could be completely emptied out.  This in turn caused issues in searchK.  Hat tip to KB Park for reporting.
+\item Fixed an issue with heldout evaluation that caused the number of tokens in the heldout set to be reported incorrectly by eval.heldout().  Note the incorrect calculation had no downstream consequences because it was only for storing the term as part of the output object.  Thanks to Jungmin Lee for spotting.
+\item Fixed a small bug that kept the cov.value1 and cov.value2 arguments of plot.estimateEffect from working when factor variables were passed to them instead of character variables. Hat tip to Rob Williams for finding that.
+\item In version 1.3.0 we changed one of the calculations for K=0 to make it faster.  This broke an old bug fix for an unusual edge case.  We have now fixed that.  Thanks to Thien Vuong Nguyen for sending info on such an edge case.
+}}
+\section{Version 1.3.0}{
+\itemize{
+\item Changed the default initialization to Spectral (thanks to Carsten Schwemmer for the reminder to do that),
+\item Important bug fix from Chris Baker that caused summary.estimateEffect to not work sometimes.
+\item A fix from Jeffrey Arnold that makes the ngroups memoization functionality work more in line with the original Hughes and Sudderth paper. 
+\item Changed documentation for the ngroups memoization functionality in accordance with info from Adel Dauod who showed that in his larger document examples setting ngroups > 1 increased the number of iterations needed for convergence.
+\item Changed the K=0 spectral initialization to use a randomized projection method to calculate the PCA which initializes the T-SNE projection.  This should make the initializations much faster for K=0 and large vocabs.
+\item You can now run for a fixed number of em steps by setting emtol=0L, you can also disallow negative changes in the bound triggering convergence using the control option allow.neg.change=FALSE.
+\item Bumped the required version of R to be consistent with package dependencies, hat tip to Sean Westwood
+\item Fixed an edge case in make.heldout where you can end up with documents being classed as non-integers. Hat tip to github user LouHb.
+\item Fixed a bug that caused R to crash for very large models on Windows machines only.  Huge thanks to Adel Dauod for reporting the bug and doing an enormous amount of testing to isolate it.
+\item Added the alignCorpus() function to help prep unseen documents for fitNewDocuments()
+\item Thanks to Vincent Arel-Bundock for adding parallel computing to searchK 
+\item Long-overdue thanks to Stephen Woloszynek for fixing some bugs in thetaPosterior when local uncertainty is chosen.
+\item Setting max.em.its=0 will now return the results of the initialization procedure.
+\item You can now pass your own custom initializations of beta.
+\item We've removed the text file reader from textProcessor but encourage users who want to read in texts to check out the excellent readtext package.
+\item stm can now take term matrices from corpus and text2vec and pass them to stm thanks to a contribution from Patrick Perry.
+\item Additional internal improvements in how inputs are handled by Patrick Perry.
+}
+}
+\section{Version 1.2.3}{
+\itemize{
+\item A small bug fix to fitNewDocuments() thanks to user: OO00OO00 on Github that cause the functionality not to work for CTMs.
+}
+}
+\section{Version 1.2.2}{
+\itemize{
+\item A small release correcting some minor bugs.
+\item Fixed a bug in estimateEffect when a character or factor variable had 2+ levels with the same number of observtions.  Thanks to APuzyk on github for catching this.
+\item The last release turned on a different recovery method for the spectral algorithm by default.  Changed the default back to exponential gradient as documented.  Thanks to Simone Zhang for this catch.
+\item Better defaults for some of the labeling in plot.STM
+\item Better argument matching and errors for plot.estimateEffect
+}
+}
+\section{Version 1.2.1}{
+\itemize{
+\item Small updates to the documentation and vignette.
+}
+}
+\section{Version 1.2.0}{
+\itemize{
+\item Thanks to efforts by Ken Benoit stm can now take a quanteda dfm object.
+\item Thanks to help from Chris Baker we are now using roxygen for our documentation.
+\item Jeffrey Arnold fixed a small bug in toLDAVis.  Thanks!
+\item Carsten Schwemmer helped us find a bug where plot.estimateEffect() didn't work when dplyr was loaded.  This is now fixed.
+\item In making the change to roxygen we unfortunately break backwards compatability.  The package's generic functions such as plot.estimateEffect() and plot.STM() can now only be called by plot() rather than by their full name.
+\item We document and export optimizeDocument which provides access to the document level E-step.
+\item We have documented and exported several of the labeling functions including calcfrex, calcscore, calclift and js.estimate.  These are marked with keyword internal because they don't have much error checking and most users will want labelTopics anyhow.  But they can be accessed with ? and are linked from labelTopics
+\item After much popular demand we have released a fitNewDocuments() function which will calculate topic proportions for documents not used to fit the models.  There are many different options here.
+\item estimateEffect now has a summary function which will make regression tables
+\item a number of the internals to plot.estimateEffect have been improved which should eliminate some edge case bugs.
+\item Much of the documentation has been updated as has the vignette.
+\item Our wrapper s() for the splines package function bs() now has predict functions associated with it so it should work in contexts like lm()
+\item We have documented and exported all the metrics for searchK()
+\item We made a change in the spectral initialization which ensures that only the top 10000 (a modifiable default) words are used in the initialization.  This allows it to be used effectively with much larger vocab.
+\item Added a modifiable max iteration timeout error for the prevalence regression in stm.  This will only matter for people using covariate sets which are very, very large.
+}
+}
+\section{Version 1.1.6}{
+\itemize{
+\item Added a new recovery algorithm used in spectral initialization from gradient descent to a more accurate and generally faster one based on quadratic programming.  This can be turned on by: control=list(recoverEG=FALSE).  Eventually we may change the default recovery method. Note: while this more
+accurately solves the actual problem, we've seen better results with the early stopping produced by
+exponential gradient not fully convering.  This has been confirmed by the Arora group as well.
+\item Clarified some of the documentation in textProcessor thanks to James Gibbon.
+\item Fixed a problem with registration of S3 methods for textProcessor()
+\item Added access to the information criterion parameter for L1 mode prevalence covariance in stm.  See the gamma.ic.k option in the control parameters of stm 
+}
+}
+\section{Version 1.1.5}{
+\itemize{
+\item searchK() can now be used with content covariates thanks to github user rosemm
+\item added a querying function based on data.table into findThoughts()
+}
+}
+\section{Version 1.1.4}{
+\itemize{
+\item Fixed a rare bug in the K=0 feature for spectral initialization where words with the exact same appearance pattern would cause the projection to fail.
+}
+}
+\section{Version 1.1.3}{
+\itemize{
+\item Fixed the unexported findTopic()
+\item Improved some documentation
+\item Small finetuning in toLDAViz
+}
+}
+\section{Version 1.1.2}{
+\itemize{
+\item Fixed a small bug that caused readCorpus to fail on dense document term matrices
+\item Fixed a small bug in the random projections algorithm
+\item Improved warnings in stm when restarting models (Hat tip to Andrew Goldstone)
+\item Added the convertCorpus function for converting stm to other formats. 
+\item Formatting changes to the vignette
+}
+}
+\section{Version 1.1.1}{
+\itemize{
+\item Updated Vignette
+}}
+\section{Version 1.1.0}{
+\itemize{
+\item Performance improvements via various optimizations including porting some components to C++
+\item Various new experimental features including K=0
+\item Improved documentation including a new version of the vignette.
+\item Better error messages in several places
+\item Experimental options for random projections with spectral initializations
+}}
+\section{Version 1.0.13}{
+\itemize{
+\item Fixes a problem in make.heldout where a document could be completely emptied by the procedure. Hat tip to Jesse  Rhodes for the bug report.
+}}
+\section{Version 1.0.12}{
+\itemize{
+\item When \code{gamma.prior="L1"} coerce the mu object back to a matrix class object.  Should fix a speed hit introduced in 1.0.10 for this case.
+}}
+\section{Version 1.0.10}{
+\itemize{
+\item Prevalence covariates can now use sparse matrices which will result in better performance for large factors.
+\item textProcessor() and prepDocuments() now do a better job of preserving labels and keeping track of dropped elements.  Special thanks to Github users gtuckerkellog and elbamos for pull requests.
+\item Fixed an edge case in init.type="Spectral" where words appearing only in documents by themselves would throw an error.  The error was correct but hard to address in certain cases, so now it temporarily removes the words and then reintroduces them before starting inference spreading a tiny bit of mass evenly across the topics.  Hat tip to Nathan Sanders for brining this to our attention.  
+\item New function findTopic() which helps locate topics containing particular words or phrases.
+\item New function topicLasso() helps build predictive models with topics.
+}}
 \section{Version 1.0.8}{
 \itemize{
 \item Fixed a minor bug in prepDocuments which arises in cases where there are vocab elements which do not appear in the data.
